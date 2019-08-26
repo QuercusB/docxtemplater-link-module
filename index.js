@@ -6,7 +6,7 @@ LinkManager = require('./src/linkManager');
 
 LinkModule = (function () {
   LinkModule.prototype.name = 'link';
-  function LinkModule (options) {
+  function LinkModule(options) {
     this.options = options | {};
   }
   LinkModule.prototype.handleEvent = function (event, eventData) {
@@ -55,28 +55,28 @@ LinkModule = (function () {
       return;
     }
     var url, text;
-    if(typeof linkData === "string") {
-        var emailRegex = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-        url = emailRegex.test(linkData) ? "mailto:" + linkData : linkData;
-        text = linkData;
+    if (typeof linkData === "string") {
+      var emailRegex = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+      url = emailRegex.test(linkData) ? "mailto:" + linkData : linkData;
+      text = linkData;
     }
     else {
-        url = linkData.url || linkData.URL;
-        text = linkData.text || linkData.TEXT;
+      url = linkData.url || linkData.URL;
+      text = linkData.text || linkData.TEXT;
     }
     linkId = this.linkManager.addLinkRels(filename, url);
     this.linkManager.addLinkStyle();
     var xmlTemplater = this.manager.getInstance('xmlTemplater');
     tagXml = xmlTemplater.fileTypeConfig.tagsXmlArray[0];
     newText = this.getLinkXml({
-      linkID : linkId,
-      linkText : text,
+      linkID: linkId,
+      linkText: text,
       size: this.getLinkFontSize(xmlTemplater, templaterState.fullTextTag)
     });
     return this.replaceBy(newText, tagXml);
   };
 
-  LinkModule.prototype.getLinkFontSize = function(xmlTemplater, fullTextTag) {
+  LinkModule.prototype.getLinkFontSize = function (xmlTemplater, fullTextTag) {
     var beforeTheTag = xmlTemplater.content.slice(0, xmlTemplater.content.indexOf(fullTextTag));
     beforeTheTag = beforeTheTag.slice(beforeTheTag.lastIndexOf("<a:endParaRPr"));
     var indexOfSz = beforeTheTag.indexOf("sz=\"");
@@ -88,28 +88,18 @@ LinkModule = (function () {
     return -1;
   }
 
-  LinkModule.prototype.getLinkXml = function(_arg) {
+  LinkModule.prototype.getLinkXml = function (_arg) {
     var linkId = _arg.linkID, linkText = _arg.linkText, size = _arg.size;
     if (this.linkManager.pptx) {
       return "</a:t></a:r><a:r><a:rPr " + (size !== -1 ? "sz=\"" + size + "\" " : "") + "lang=\"en-US\" dirty=\"0\" smtClean=\"0\"><a:hlinkClick r:id=\"rId" + linkId + "\"/></a:rPr><a:t>" + linkText + "</a:t></a:r><a:r><a:t>";
     }
-    return  "</w:t></w:r><w:hyperlink r:id=\"rId" + linkId + "\" w:history=\"1\"><w:bookmarkStart w:id=\"0\" w:name=\"_GoBack\"/><w:bookmarkEnd w:id=\"0\"/><w:r w:rsidR=\"00052F25\" w:rsidRPr=\"00052F25\"><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t>" + linkText + "</w:t></w:r></w:hyperlink><w:r><w:t xml:space=\"preserve\">";
+    return "</w:t></w:r><w:hyperlink r:id=\"rId" + linkId + "\" w:history=\"1\"><w:bookmarkStart w:id=\"0\" w:name=\"_GoBack\"/><w:bookmarkEnd w:id=\"0\"/><w:r w:rsidR=\"00052F25\" w:rsidRPr=\"00052F25\"><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t>" + linkText + "</w:t></w:r></w:hyperlink><w:r><w:t xml:space=\"preserve\">";
   }
 
   LinkModule.prototype.replaceBy = function (text, outsideElement) {
     var innerTag = this.getInnerTag().text;
-    var subContent = this.linkManager.pptx ? this.getOuterXml(outsideElement) : this.addAttribute(outsideElement, 'xml:space', '"preserve"');
-    return this.manager.getInstance('xmlTemplater').replaceXml(subContent, subContent.text.replace(innerTag, text));
-  };
-
-  LinkModule.prototype.addAttribute = function(outsideElement, attribute, value){
     var subContent = this.getOuterXml(outsideElement);
-    if (subContent.text.indexOf(attribute) < 0) {
-      var replaceRegex = '<' + outsideElement;
-      var replaceWith = '<' + outsideElement + ' ' + attribute + '=' + value;
-      subContent.text = subContent.text.replace(new RegExp(replaceRegex, 'g'), replaceWith);
-    }
-    return subContent;
+    return this.manager.getInstance('xmlTemplater').replaceXml(subContent, subContent.text.replace(innerTag, text));
   };
 
   LinkModule.prototype.getInnerTag = function () {
@@ -122,7 +112,7 @@ LinkModule = (function () {
     return this.getInnerTag().getOuterXml(outsideElement);
   }
 
-  LinkModule.prototype.finished = function() {};
+  LinkModule.prototype.finished = function () { };
 
   return LinkModule;
 })();
